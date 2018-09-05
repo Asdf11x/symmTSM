@@ -63,14 +63,14 @@ print(distance_no_zero)
 for element in range(len(distances)):
     result += min(distances[element])
     distances.index(min(distances[0]))
-    update()
+    # update()
 
 
 def hillclimbing(distances, result):
+    pass
+    # for
 
-    for
-
-    return "array", "updated result"
+    # return "array", "updated result"
 
 
 
