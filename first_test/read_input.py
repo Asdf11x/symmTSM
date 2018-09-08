@@ -3,6 +3,7 @@
 import numpy as np
 import math
 from random import randint
+import copy
 
 line_start = 0
 result = 0
@@ -66,7 +67,7 @@ print(update_list)
 class Container:
     def __init__(self, distance_list, remaining_locations, current_location, first_location, distance):
         self.distance_list = distance_list
-        self.distance_list_deleting = distance_list
+        self.distance_list_working = copy.deepcopy(self.distance_list)
         self.remaining_locations = remaining_locations
         self.current_location = current_location
         self.first_location = first_location
@@ -74,37 +75,37 @@ class Container:
         self.search_history = []
 
         self.remaining_locations.remove(self.first_location)
+        for element in range(len(self.distance_list_working)):
+            self.distance_list_working[element][self.first_location] = 999
         self.search_history.append(first_location)
 
     def __repr__(self):
         return "\nCONTAINER: " \
                "\ndistance_list:%s " \
+               "\ndistance_list_working: %s" \
                "\nremaining_locations:%s" \
                "\ncurrent_location: %s" \
                "\nfirst_location: %s" \
                "\ndistance: %s" \
-               "\nsearch_history: %s\n" % (self.distance_list, self.remaining_locations, self.current_location,
+               "\nsearch_history: %s\n" % (self.distance_list, self.distance_list_working, self.remaining_locations, self.current_location,
                                    self.first_location, self.distance, self.search_history)
 
 
 def update_step_container(container, next_location):
 
-    container.distance += container.distance_list[container.current_location][next_location]
-
-    print("curr")
-    print(container.current_location)
-
-    # print("remaining:")
-
     if container.current_location in container.remaining_locations:
-        print("heeeere")
         container.remaining_locations.remove(container.current_location)
         container.search_history.append(container.current_location)
 
-    container.current_location = next_location
+        for element in container.distance_list_working:
+            element[container.current_location] = 999
 
-    if not container.remaining_locations and container.current_location is not container.first_location:
-        container.distance += container.distance_list[container.current_location][container.first_location]
+    if container.remaining_locations:
+        container.distance += container.distance_list[container.current_location][next_location]
+    else:
+        container.distance += container.distance_list[container.search_history[-1]][container.first_location]
+
+    container.current_location = next_location
 
     return container
 
@@ -114,14 +115,13 @@ def naive_search():
 
     for element in range(len(container.distance_list)):
 
+        next_min_distance = min(container.distance_list_working[container.current_location])
+        next_location = container.distance_list_working[container.current_location].index(next_min_distance)
 
-        next_location = min(container.distance_list[container.current_location])
-
-        container = update_step_container(container,
-                                          container.distance_list[container.current_location].index(next_location))
-        print(container)
+        container = update_step_container(container, next_location)
 
     # print dem bois
+    print(container)
     print("CONTAINER METHOD")
     print(container.distance)
     print(container.search_history)
